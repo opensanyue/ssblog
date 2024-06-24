@@ -1,0 +1,126 @@
+﻿@model aspnetMCVBSUser1.Models.Post
+
+@{
+    ViewData["Title"] = "新建Markdown";
+    Layout = "/views/shared/_Layout2.cshtml";
+}
+
+
+<div class="container-xxl">
+    <div class="row">
+        <div class="col-md-12">
+            <form asp-action="Create">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="form-group">
+                    <input asp-for="PostType" class="form-control" type="hidden" value="1" />
+                    <span asp-validation-for="PostType" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Title" class="control-label" ></label>
+                    <input asp-for="Title" class="form-control" />
+                    <span asp-validation-for="Title" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label>内容</label>
+                    <input asp-for="Content" class="form-control" type="hidden" />
+                    <div id="editor" >
+                        <!-- Tips: Editor.md can auto append a `<textarea>` tag -->
+                        <textarea style="display:none;"></textarea>
+                    </div>
+                    <span asp-validation-for="Content" class="text-danger"></span>
+                </div>
+                @*  <div class="form-group">
+                <label asp-for="CreateDate" class="control-label"></label>
+                <input asp-for="CreateDate" class="form-control" />
+                <span asp-validation-for="CreateDate" class="text-danger"></span>
+                </div> *@
+                @*  <div class="form-group">
+                <label asp-for="hits" class="control-label"></label>
+                <input asp-for="hits" class="form-control" />
+                <span asp-validation-for="hits" class="text-danger"></span>
+                </div> *@
+                <div class="form-group">
+                    <label asp-for="CategoryId" class="control-label" ></label>
+                    <select asp-for="CategoryId" class="form-control" asp-items="ViewBag.CategoryId"></select>
+                </div>
+                @*  <div class="form-group">
+                <label asp-for="CSort" class="control-label"></label>
+                <input asp-for="CSort" class="form-control" />
+                <span asp-validation-for="CSort" class="text-danger"></span>
+                </div> *@
+                <div class="form-group mt-5 mb-5">
+                    <input type="submit" value="保存" class="btn btn-primary" />
+                </div>
+            </form>
+           
+        </div>
+    </div>
+
+</div>
+
+@section Scripts {
+    <script src="~/lib/ueditor/ueditor.config.js"></script>
+    <script src="~/lib/ueditor/ueditor.all.js"></script>
+    <script src="~/lib/ueditor/lang/zh-cn/zh-cn.js"></script>
+    <script src="~/lib/editormd/examples/js/zepto.min.js"></script>
+
+    <script type="text/javascript">
+        $(function () {
+            var editor = editormd("editor", {
+                height: "800px",
+                width:"100%",
+                // width:"100%",
+                //innerWidth: "100%",
+                // height: "100%",
+                // markdown: "xxxx",     // dynamic set Markdown text
+                placeholder: "在这里输入MarkDown",
+                path: "/lib/editormd/lib/",  // Autoload modules mode, codemirror, marked... dependents libs path
+
+                //codeFold: true,
+                watch: true,
+                //htmlDecode: "style,script,iframe|on*",
+                taskList: true,
+                //tocm: true,
+                // tex: true,                   // 开启科学公式TeX语言支持，默认关闭
+                // flowChart: true,             // 开启流程图支持，默认关闭
+                // sequenceDiagram: true,       // 开启时序/序列图支持，默认关闭,
+
+                imageUpload: true,
+                imageFormats: ["jpg", "jpeg", "gif", "png", "bmp", "webp"],
+                imageUploadURL: "/UEditor/UpImage/1",
+                onload: function () {
+                    
+                    $('form').submit(function () {
+                        var i = editor.getMarkdown();
+                        $('#Content').val(i);
+                    });
+
+                    editor.config("syncScrolling", "single");
+                },
+                onfullscreen: function () {
+                    
+                    const mymd = document.getElementById("editor");
+                    mymd.style.width = "100%";
+                },
+                onfullscreenExit: function () {
+                   
+                    const mymd = document.getElementById("editor");
+                    mymd.style.width = "100%";
+                    editor.hideToolbar();
+                    editor.showToolbar();
+                    
+                }
+               
+            });
+           
+        });
+
+      
+    </script>
+
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+
+}

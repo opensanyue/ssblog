@@ -1,0 +1,18 @@
+﻿@{
+    ViewData["Title"] = "上传";
+    Layout = "~/Views/Shared/_Layout2.cshtml";
+}
+<div class="container-xxl text-bg-light p-3">
+<div>
+        <form asp-action="CheckMultipleMdFileImg" method="post" enctype="multipart/form-data">
+
+            <p style="overflow:hidden;"> markdown文件或目录： <input type="text" name="files" style="width:100%" /></p>  
+            <p style="overflow:hidden;">markdown文件中图像所在的目录： <input type="text" name="dirs" style="width:100%" /></p>
+            <p> 备注：图像在"c:\blog\image\" 只要输入 "c:\blog\"即可。</p>
+            <input type="submit" value="格式检查" />
+          
+    </form>
+   
+</div>
+
+</div>

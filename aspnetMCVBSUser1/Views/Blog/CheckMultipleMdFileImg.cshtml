@@ -1,0 +1,72 @@
+﻿@model IEnumerable<aspnetMCVBSUser1.Models.ViewModels.PostImg>
+
+@{
+    ViewData["Title"] = "CheckMultipleMdFileImg";
+    Layout = "~/Views/Shared/_Layout2.cshtml";
+}
+
+<div class="bg-body">
+    <form asp-action="ImportMd" method="post" enctype="multipart/form-data">
+
+    <br />
+        <p class="ms-3 " style="color:red"> <input type="submit" value="导入" />    如果下面有警告，请检查或修正警告。也可忽略警告，直接导入。</p>
+        
+    </form>
+    <hr />
+
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                找不到图片的文件
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            if (item.imgList.Count > 0)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Name)
+                    </td>
+                </tr>
+                @foreach (var item1 in item.imgList)
+                {
+                    <tr>
+                        <td style="color:cornflowerblue">
+                            @Html.Raw("___")   @Html.DisplayFor(modelItem => item1.Key)
+                        </td>
+                    </tr>
+                }
+            }
+        }
+    </tbody>
+</table>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                无图片的文件
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            if (item.imgList.Count <= 0)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Name)
+                    </td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
+</div>

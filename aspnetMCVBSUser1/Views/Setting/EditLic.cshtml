@@ -1,0 +1,174 @@
+﻿@model aspnetMCVBSUser1.Models.ViewModels.ConfigModel
+
+@{
+    ViewData["Title"] = "捐助";
+    Layout = "/views/shared/_Layout2.cshtml";
+}
+
+
+<div class="container-xxl text-bg-light p-3">
+    <div class="row">
+        <div class="col-12">
+            <form asp-action="EditLic">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                @*  <input type="hidden" asp-for="Id" /> *@
+                <div id="test-markdown-view" class="bg-light">
+                    <textarea style="display:none;"> 
+
+# 捐助
+
+### 一、级别说明
+
+本软件是开源的。但是`捐助`了，会根据金额在页面底部显示**用户级别**。
+
+|   金额   |              级别              |
+| :------: | :----------------------------: |
+|   0元    |            免费用户            |
+|   10元   |            青铜用户            |
+|   20元   |            白银用户            |
+|   30元   |            黄金用户            |
+|   40元   |            铂金用户            |
+| 50元以上 | 钻石用户   或   用户自定义内容 |
+
+### 二、捐助流程
+
+#### 1、所有捐助通过淘宝实现，进入我的网店，选择用户级别**下单**。
+
+* 通过网址进入网店：https://ssjywd.taobao.com/    （山水酒月网店 ssjywd）
+* 通过**淘宝搜索栏**进入网店：淘宝首页\登陆\在“搜索栏”左侧选“店铺”\输入“106333234”
+* 通过手机淘宝扫码进入网店：![](data:image/png;base64,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)
+
+
+
+#### 2、下单完成，把“机器码”通过淘宝传给我们。
+
+机器码位置：在本页底部。
+
+#### 3、 收到“机器码”后我们会用最快时间通过淘宝把“注册码”发给您。
+
+注册位置：在本页底部。
+
+如注册成功，在“博客**首页**”文章列表**底部**，会显示你的**级别**。
+
+### 三、注册
+                </textarea>
+                </div>
+                <div class="form-group ps-4">
+                    <label class="control-label pb-2">机器码</label>
+                    <label class="form-control" >@ViewData["RegInfo"]</label>
+                </div>
+                <div class="form-group  ps-4">
+                    <label  class="control-label  p-2">输入License</label>
+                    <textarea  asp-for="Lic" class="form-control" rows="10"></textarea>
+                    <span asp-validation-for="Lic" class="text-danger"></span>
+                </div>
+
+                @*    <div class="form-group">
+                <label asp-for="DefultEditorIsMarkdown" class="control-label"></label>
+                <input asp-for="DefultEditorIsMarkdown" class="form-control" />
+                <span asp-validation-for="DefultEditorIsMarkdown" class="text-danger"></span>
+                </div> *@
+                @* @{
+                string DefultEditorIsMarkdownflay = Model.DefultEditorIsMarkdown ? "checked" : "";
+                string DefultEditorIsMarkdownflay1 = !Model.DefultEditorIsMarkdown ? "checked" : "";
+                } *@
+                @* <div class="form-group pt-3">
+                <label asp-for="DefultEditorIsMarkdown" class="control-label p-2"></label>
+
+                <div class="form-radio">
+                @Html.RadioButtonFor(model => model.DefultEditorIsMarkdown, "true")
+
+                <label class="form-check-label" for="flexRadioDefault1">
+                MarkDown
+                </label>
+
+                </div>
+
+                <div class="form-radio pt-2">
+                @Html.RadioButtonFor(model => model.DefultEditorIsMarkdown, "false")
+                <label class="form-check-label" for="flexRadioDefault2">
+                Html编辑器
+                </label>
+                </div> *@
+                @*  @Html.RadioButtonFor(model => model.DefultEditorIsMarkdown, "true") MarkDown
+                @Html.RadioButtonFor(model => model.DefultEditorIsMarkdown, "false") Html编辑器
+                <input asp-for="DefultEditorIsMarkdown" class="form-Radio" /> aaa *@
+                @*  <span asp-validation-for="DefultEditorIsMarkdown" class="text-danger"></span>
+                </div> *@
+
+              @*   <div class="form-group pt-3">
+                    <label asp-for="PageSize" class="control-label  p-2"></label>
+                    <input asp-for="PageSize" class="form-control" />
+                    <span asp-validation-for="PageSize" class="text-danger"></span>
+                </div> *@
+
+                @*  <div class="form-group pt-3">
+                <label asp-for="Author" class="control-label  p-2"></label>
+                <input asp-for="Author" class="form-control" />
+
+                <span asp-validation-for="Author" class="text-danger"></span>
+                </div> *@
+
+                <div class="form-group  mt-5 mb-5 ps-4">
+                    <input type="submit" value="注册" class="btn btn-primary   " />
+                </div>
+            </form>
+        </div>
+    </div>
+    <footer class="border-top footer text-muted">
+        <div class="container mt-0 pb-0 clearfix">
+            <p class="float-start">&copy; 2024 - 山水酒月  -  <span id="star-rating"></span> <span class="text-danger"> @ViewData["WelcomeSpeech"] </span></p>
+
+        </div>
+    </footer>
+</div>
+
+<script src="~/lib/google-code-prettify/src/prettify.js"></script>
+@Html.Raw(ViewBag.js);
+
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script type="text/javascript">
+
+
+        // function showalertCancel() {
+        //     alert("保存失败");
+        // };
+        // function showalertOk() {
+        //     alert("保存成功");
+        // };
+        // window.onload = function () {
+        // @ViewData["isshowalert"]
+
+        //         }
+
+        $(function () {
+            var testView = editormd.markdownToHTML("test-markdown-view", {
+                // markdown : "[TOC]\n### Hello world!\n## Heading 2", // Also, you can dynamic set Markdown text
+                // htmlDecode : true,  // Enable / disable HTML tag encode.
+                htmlDecode: "style,script,iframe",  // Note: If enabled, you should filter some dangerous HTML tags for website security.
+                taskList: true,
+            });
+        });
+        window.onload = function (event) {
+            // setupStars();
+            insertStar1(@ViewData["Grade"]);
+        }
+        function insertStar1(length) {
+
+            const starOff = '<i class="bi bi-star-fill text-danger"></i>';
+
+            var ii = "";
+            for (let i = 0; i < length; i++) {
+
+                ii += starOff;
+            }
+            document.getElementById("star-rating").innerHTML = ii;
+        }
+    </script>
+
+
+}

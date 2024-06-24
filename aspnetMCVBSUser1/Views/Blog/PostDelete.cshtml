@@ -1,0 +1,75 @@
+﻿@model aspnetMCVBSUser1.Models.Post
+
+@{
+    ViewData["Title"] = "删除文章";
+    Layout = "~/Views/Shared/_Layout2.cshtml";
+}
+<div class="container-xxl bg-body">
+    <div >
+     @*    <Br>
+    <dl class="row">
+       
+        <dd class="col-sm-10">
+                <h4>删除: <Br><Br> @Html.DisplayFor(model => model.Title)</h4>
+        </dd> *@
+            @*  <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Content)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Content)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.CreateDate)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.CreateDate)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.hits)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.hits)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Category)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Category!.Id)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.CSort)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.CSort)
+        </dd> *@
+   @*  </dl>
+       
+    <form asp-action="Delete">
+        <input type="hidden" asp-for="Id" />
+            <input type="submit" value="删除" asp-action="PostDeleteConfirmed" asp-controller="Blog" class="btn btn-danger" /> |
+        <a asp-action="Index" asp-controller="Blog">返回</a>
+    </form> *@
+
+
+        <div class="card position-absolute top-50 start-50 translate-middle" style="width: 18rem;height:12rem">
+            <div class="card-body">
+                <h5 class="card-title fw-bold">删除</h5>
+                <hr class="divider">
+                <p class="card-text h-25 text-truncate">确定删除: @Html.DisplayFor(model => model.Title)</p>
+                <hr class="divider">
+                <div class="modal-footer">
+                <form asp-action="Delete">
+                        <a class="btn btn-secondary me-3" asp-action="Index" asp-controller="Blog">返回</a>
+
+                    <input type="hidden" asp-for="Id" />
+                    <input type="submit" value="删除" asp-action="PostDeleteConfirmed" asp-controller="Blog" class="btn btn-danger card-link" /> 
+                    
+                   
+                </form>
+               </div>
+            </div>
+        </div> 
+
+
+    </div>
+</div>

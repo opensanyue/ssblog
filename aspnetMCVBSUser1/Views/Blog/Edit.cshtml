@@ -1,0 +1,151 @@
+﻿@model aspnetMCVBSUser1.Models.Post
+
+@{
+    ViewData["Title"] = "编辑文章";
+    Layout = "/views/shared/_Layout2.cshtml";
+}
+<div class="container-xxl">
+    <div class="row">
+        <div class="col-12">
+            <form asp-action="Edit">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <input type="hidden" asp-for="Id" />
+                <input type="hidden" asp-for="CSort" />
+                <div class="form-group">
+                    <input asp-for="PostType" class="form-control" type="hidden" />
+                    <span asp-validation-for="PostType" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Title" class="control-label"></label>
+                    <input asp-for="Title" class="form-control" />
+                    <span asp-validation-for="Title" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label>内容</label>
+                    <input asp-for="Content" class="form-control" type="hidden" />
+                    @if (Model.PostType == 0)
+                    {
+                        <script id="container" name="contentner" type="text/html">
+                            @Html.Raw(Model.Content)
+                        </script>
+                    }
+                    else
+                    {
+                        <div id="editor">
+                            <textarea style="display:none;">@Html.Raw(Model.Content)</textarea>
+                        </div>
+                    }
+
+                    <span asp-validation-for="Content" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    
+                    <input asp-for="CreateDate" class="form-control" type="hidden" />
+                    <span asp-validation-for="CreateDate" class="text-danger"></span>
+                </div>
+                @*  <div class="form-group">
+                <label asp-for="hits" class="control-label"></label>
+                <input asp-for="hits" class="form-control" />
+                <span asp-validation-for="hits" class="text-danger"></span>
+                </div> *@
+                <div class="form-group">
+                    <label asp-for="CategoryId" class="control-label"></label>
+                    <select asp-for="CategoryId" class="form-control" asp-items="ViewBag.CategoryId"></select>
+                    <span asp-validation-for="CategoryId" class="text-danger"></span>
+                </div>
+                @*   <div class="form-group">
+                <label asp-for="CSort" class="control-label"></label>
+                <input asp-for="CSort" class="form-control" />
+                <span asp-validation-for="CSort" class="text-danger"></span>
+                </div> *@
+                <div class="form-group  mt-5 mb-5">
+                    <input type="submit" value="保存" class="btn btn-primary" />
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+
+    <script src="~/lib/ueditor/ueditor.config.js"></script>
+    <script src="~/lib/ueditor/ueditor.all.js"></script>
+    <script src="~/lib/ueditor/lang/zh-cn/zh-cn.js"></script>
+    <script src="~/lib/editormd/examples/js/zepto.min.js"></script>
+
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script type="text/javascript">
+
+
+        $(function () {
+            if (@Model.PostType== 0) {
+                //html
+                var ue = UE.getEditor('container', {
+                    autoFloatEnabled: true,
+                    autoHeightEnabled:false,//显示滚动条
+                    initialFrameHeight: 800,
+                    initialFrameWidth: '100%',
+                });
+                ue.ready(function () {
+                    //ue.setHeight(784);
+
+                    $('form').submit(function () {
+                        $('#Content').val(ue.getContent());
+                    });
+                });
+            } else {
+                try {
+                    //markdown
+                    var editor = editormd("editor", {
+                        height: "800px",
+                        width: "100%",
+                        //markdown: ,     // dynamic set Markdown text
+                        path: "/lib/editormd/lib/",  // Autoload modules mode, codemirror, marked... dependents libs path
+                        placeholder: "在这里输入MarkDown",
+                        
+                        // codeFold: true,
+                        watch: true,
+                        // htmlDecode: "style,script,iframe|on*",
+                        taskList: true,
+                        // tocm: true,
+                        // tex: true,                   // 开启科学公式TeX语言支持，默认关闭
+                        // flowChart: true,             // 开启流程图支持，默认关闭
+                        // sequenceDiagram: true,       // 开启时序/序列图支持，默认关闭,
+
+
+                        imageUpload: true,
+                        imageFormats: ["jpg", "jpeg", "gif", "png", "bmp", "webp"],
+                        imageUploadURL: "/UEditor/UpImage/1",
+                        onload: function () {
+                            $('form').submit(function () {
+                                var i = editor.getMarkdown();
+                                $('#Content').val(i);
+                            });
+                            // console.log("onchange =>", this, this.id, this.settings, this.state);
+                            editor.config("syncScrolling", "single");
+                        },
+                        onfullscreen: function () {
+
+                            const mymd = document.getElementById("editor");
+                            mymd.style.width = "100%";
+                        },
+                        onfullscreenExit: function () {
+
+                            const mymd = document.getElementById("editor");
+                            mymd.style.width = "100%";
+                            editor.hideToolbar();
+                            editor.showToolbar();
+
+                        }
+                    });
+                } catch (err) {
+                    console.log(err);
+                }
+            }
+        });
+    </script>
+}

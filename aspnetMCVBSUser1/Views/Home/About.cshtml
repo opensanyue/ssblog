@@ -1,0 +1,74 @@
+﻿@{
+    ViewData["Title"] = "关于";
+    Layout = "/views/shared/_Layout2.cshtml";
+}
+
+<div class="container-xxl bg-light  pt-3">
+
+            <div id="test-markdown-view" class="bg-light">
+                <textarea style="display:none;"> 
+
+# 关于 
+“山水博客” (ssblog v0.0.1）是一套博客系统。可以部署到`win10(专业版)`自带的`iis`上。
+
+### 主要特色
+
+1、无限分类。分类的长度和深度无限制，可以拖动调整位置。
+
+2、支持**html**和**markdown**两种格式
+
+3、支持每个分类下文章的**排序**。
+
+4、备份。只要复制根目录下的`db.db`（数据库）和`upload`目录即可。
+
+5、可以导入`Typoar`文章。
+
+
+
+                </textarea>
+            </div>
+
+    <footer class="border-top footer text-muted">
+        <div class="container mt-3 pb-3 clearfix">
+            <p class="float-start">&copy; 2024 - 山水酒月  -  <span id="star-rating"></span> <span class="text-danger"> @ViewData["WelcomeSpeech"] </span></p>
+           
+        </div>
+    </footer>
+</div>
+@* <script src="~/lib/editormd/lib/jquery.flowchart.min.js"></script> *@
+@* <script src="~/lib/editormd/examples/js/zepto.min.js"></script>
+<script src="~/lib/editormd/lib/prettify.min.js"></script> *@
+@* <script src="~/lib/editormd/lib/raphael.min.js"></script> *@
+<script src="~/lib/google-code-prettify/src/prettify.js"></script>
+@* <script src="~/lib/editormd/lib/underscore.min.js"></script> *@
+@* <script src="~/lib/editormd/lib/sequence-diagram.min.js"></script> *@
+@* <script src="~/lib/editormd/lib/flowchart.min.js"></script> *@
+
+
+<script type="text/javascript">
+    $(function () {
+        var testView = editormd.markdownToHTML("test-markdown-view", {
+            // markdown : "[TOC]\n### Hello world!\n## Heading 2", // Also, you can dynamic set Markdown text
+            // htmlDecode : true,  // Enable / disable HTML tag encode.
+            htmlDecode : "style,script,iframe",  // Note: If enabled, you should filter some dangerous HTML tags for website security.
+            taskList: true,
+        });
+    });
+
+
+    window.onload = function (event) {
+        // setupStars();
+        insertStar1(@ViewData["Grade"]);
+    }
+    function insertStar1(length) {
+
+        const starOff = '<i class="bi bi-star-fill text-danger"></i>';
+
+        var ii = "";
+        for (let i = 0; i < length; i++) {
+
+            ii += starOff;
+        }
+        document.getElementById("star-rating").innerHTML = ii;
+    }
+</script>

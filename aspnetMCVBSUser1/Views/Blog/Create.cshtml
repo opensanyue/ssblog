@@ -1,0 +1,82 @@
+﻿@model aspnetMCVBSUser1.Models.Post
+
+@{
+    ViewData["Title"] = "新建";
+    Layout = "~/Views/Shared/_Layout2.cshtml";
+}
+
+<div class="container-xxl">
+    <div class="row">
+        <div class="col-md-12">
+            <form asp-action="Create">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="form-group">
+                    <label asp-for="Title" class="control-label"></label>
+                    <input asp-for="Title" class="form-control" />
+                    <span asp-validation-for="Title" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Content" class="control-label"></label>
+                    @* <input asp-for="Content" class="form-control" /> *@
+                    <script id="container" name="content" type="text/html">
+
+                    </script>
+                    <span asp-validation-for="Content" class="text-danger"></span>
+                </div>
+               @*  <div class="form-group">
+                    <label asp-for="CreateDate" class="control-label"></label>
+                    <input asp-for="CreateDate" class="form-control" />
+                    <span asp-validation-for="CreateDate" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="hits" class="control-label"></label>
+                    <input asp-for="hits" class="form-control" />
+                    <span asp-validation-for="hits" class="text-danger"></span>
+                </div> *@
+                <div class="form-group">
+                    <label asp-for="CategoryId" class="control-label"></label>
+                    <select asp-for="CategoryId" class="form-control" asp-items="ViewBag.CategoryId"></select>
+                </div>
+               @*  <div class="form-group">
+                    <label asp-for="CSort" class="control-label"></label>
+                    <input asp-for="CSort" class="form-control" />
+                    <span asp-validation-for="CSort" class="text-danger"></span>
+                </div> *@
+                <div class="form-group mt-5 mb-5">
+                    <input type="submit" value="保存" class="btn btn-primary" />
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>
+
+@section Scripts {
+    <script src="~/lib/ueditor/ueditor.config.js"></script>
+    <script src="~/lib/ueditor/ueditor.all.js"></script>
+    <script src="~/lib/ueditor/lang/zh-cn/zh-cn.js"></script>
+
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script type="text/javascript">
+
+
+        $(function () {
+            var ue = UE.getEditor('container', {
+                autoFloatEnabled: true,
+                autoHeightEnabled: false,//显示滚动条
+                initialFrameHeight: 800,
+                initialFrameWidth: '100%',
+            });
+            ue.ready(function () {
+                // ue.setHeight(784);
+
+                $('form').submit(function () {
+                    $('#Content').val(ue.getContent());
+                });
+            });
+        });
+    </script>
+}

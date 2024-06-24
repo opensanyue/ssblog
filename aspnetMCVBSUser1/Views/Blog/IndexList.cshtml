@@ -1,0 +1,41 @@
+﻿@model PaginatedList<aspnetMCVBSUser1.Models.Post>
+@{
+    var showBut = (User != null && User.Identity != null && User.Identity.IsAuthenticated) ? 1 : 0;
+}
+@foreach (var item in Model)
+{
+
+    <ul class="list-group list-group-flush mb-1">
+        <li class="list-group-item  border-bottom ">
+            <h5>   @Html.ActionLink(item.Title, "Details", "Blog", new { id = item.Id }, new { Class = "link-primary text-decoration-none" }) </h5>
+            <div style="color:	#696969">
+            @Html.Raw("类别:")   @Html.DisplayFor(modelItem => item.Category!.Name) &nbsp;
+           
+          
+            @if (item.PostType == 0)
+            {
+                @Html.Raw(" 格式:Html &nbsp;")
+            }
+            else
+            {
+                @Html.Raw(" 格式:MarkDown &nbsp;")
+            }
+                @Html.Raw(" 更新:")   @Html.DisplayFor(modelItem => item.UpdataDate) &nbsp;
+                @Html.Raw(" 创建:")   @Html.DisplayFor(modelItem => item.CreateDate) &nbsp;
+                @Html.Raw(" 位置:")   @Html.DisplayFor(modelItem => item.CSort) &nbsp;
+                
+            @if (showBut == 1)
+            {
+                <a asp-controller="Blog" asp-action="Edit" asp-route-id="@item.Id">编辑</a>
+                @Html.Raw("&nbsp;");
+                <a asp-controller="Blog" asp-action="PostDelete" asp-route-id="@item.Id">删除</a>
+                @Html.Raw("&nbsp;");
+            }
+              
+            </div>
+        </li>
+
+    </ul>
+
+}
+

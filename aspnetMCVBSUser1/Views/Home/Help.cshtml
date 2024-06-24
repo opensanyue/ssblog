@@ -1,0 +1,286 @@
+﻿@{
+    ViewData["Title"] = "帮忙";
+    Layout = "/views/shared/_Layout2.cshtml";
+}
+
+<div class="container-xxl bg-light  pt-3">
+
+            <div id="test-markdown-view" class="bg-light">
+                <textarea style="display:none;"> 
+
+# 帮助
+
+## 三、MarkDown基础示例
+
+### 1、标题
+
+```c#
+# 一级标题
+## 二级标题
+### 三级标题
+#### 四级标题
+##### 五级标题
+###### 六级标题
+```
+
+# 一级标题
+## 二级标题
+### 三级标题
+#### 四级标题
+##### 五级标题
+###### 六级标题
+
+
+
+### 2、文本
+
+```c#
+文本可以**加粗**、*倾斜*和~~删除~~
+```
+
+文本可以**加粗**、*倾斜*和~~删除~~
+
+
+
+### 3、段落
+
+* 使用两个以上空格加上回车`换行`
+* 使用空行`换行`
+
+```
+我是markdown文本  
+我是html文本
+
+我是一段文本
+```
+
+我是markdown文本  
+我是html文本
+
+我是一段文本
+
+
+
+### 4、分隔线
+
+```
+***
+```
+***
+
+
+
+### 5、脚注
+
+```
+我是markdown[^md]。
+
+[^md]轻量级标记语言
+```
+
+我是markdown[^md]。
+
+[^md]:轻量级标记语言
+
+
+
+### 6、列表
+
+#### 1. 有序列表和无序列表
+
+```
+1. 列表1
+    * 子表1
+    * 子表2
+    * 子表3
+1. 列表2
+    1. 子表1
+    1. 子表2
+    1. 子表3
+1. 列表3
+```
+
+1. 列表1
+    * 子表1
+    * 子表2
+    * 子表3
+1. 列表2
+    1. 子表1
+    2. 子表2
+    3. 子表3
+1. 列表3
+
+
+#### 2. 选择列表
+
+```
+* [x] 你好,Markdown 1
+* [x] 你好,Markdown 2
+* [ ] 你好,Markdown 3
+    * [ ] 你好,Markdown 3-1
+    * [ ] 你好,Markdown 3-2
+    * [ ] 你好,Markdown 3-3
+* [ ] 你好,Markdown 4
+    * [ ] 你好,Markdown 4-1
+    * [x] 你好,Markdown 4-2
+```
+* [x] 你好,Markdown 1
+* [x] 你好,Markdown 2
+* [ ] 你好,Markdown 3
+    * [ ] 你好,Markdown 3-1
+    * [ ] 你好,Markdown 3-2
+    * [ ] 你好,Markdown 3-3
+* [ ] 你好,Markdown 4
+    * [ ] 你好,Markdown 4-1
+    * [x] 你好,Markdown 4-2
+
+
+
+### 7、引用（区块）
+
+```
+> 我是markdown
+>> 我是markdown
+>>> 我是markdown
+```
+
+> 我是markdown
+> > 我是markdown
+> >
+> > > 我是markdown
+
+
+
+### 8、代码
+
+#### 1.  单行代码
+
+   ```
+   `print("你好,Markdown!")`
+   ```
+
+   `print("你好,Markdown!")`
+
+#### 2. 多行代码
+
+代码块不能使用转义字符，所以这里加了注释/\* ... \*/,以显示完整的代码块。
+
+   ```java
+   /*```java
+   print("你好,Markdown!");
+   print("拥抱Markdown!");
+   ```*/
+   ```
+
+
+   ```java
+   print("你好,Markdown!");
+   print("拥抱Markdown!");
+   ```
+
+
+
+### 9、链接
+
+```
+[这是一个链接](http://www.bing.com)
+```
+
+[这是一个链接](http://www.bing.com)
+
+
+
+### 10、图片
+
+```
+![一张图片](http://www.ssjy.com)
+```
+
+![一张图片](http1://www.ssjy.com)
+
+
+
+### 11、表格
+
+#### 1. 简单表格
+
+```
+| 编号 | 姓名 | 性别 |
+| ---- | ---- | ---- |
+| 1    | 张三 | 男   |
+| 2    | 李四 | 男   |
+| 3    | 王五 | 男   |
+```
+
+| 编号 | 姓名 | 性别 |
+| ---- | ---- | ---- |
+| 1    | 张三 | 男   |
+| 2    | 李四 | 男   |
+| 3    | 王五 | 男   |
+
+#### 2. 对齐
+
+```
+| 编号（左对齐） | 姓名（右对齐） | 性别（居中） |
+| :---- | ----: | :----: |
+| 1    | 张三 | 男   |
+| 2    | 李四 | 男   |
+| 3    | 王五 | 男   |
+```
+
+| 编号（左对齐） | 姓名（右对齐） | 性别（居中） |
+| :---- | ----: | :----: |
+| 1    | 张三 | 男   |
+| 2    | 李四 | 男   |
+| 3    | 王五 | 男   |
+
+
+
+
+                </textarea>
+            </div>
+
+    <footer class="border-top footer text-muted">
+        <div class="container mt-3 pb-3 clearfix">
+            <p class="float-start">&copy; 2024 - 山水酒月  -  <span id="star-rating"></span> <span class="text-danger"> @ViewData["WelcomeSpeech"] </span></p>
+           
+        </div>
+    </footer>
+</div>
+@* <script src="~/lib/editormd/lib/jquery.flowchart.min.js"></script> *@
+@* <script src="~/lib/editormd/examples/js/zepto.min.js"></script>
+<script src="~/lib/editormd/lib/prettify.min.js"></script> *@
+@* <script src="~/lib/editormd/lib/raphael.min.js"></script> *@
+<script src="~/lib/google-code-prettify/src/prettify.js"></script>
+@* <script src="~/lib/editormd/lib/underscore.min.js"></script> *@
+@* <script src="~/lib/editormd/lib/sequence-diagram.min.js"></script> *@
+@* <script src="~/lib/editormd/lib/flowchart.min.js"></script> *@
+
+
+<script type="text/javascript">
+    $(function () {
+        var testView = editormd.markdownToHTML("test-markdown-view", {
+            // markdown : "[TOC]\n### Hello world!\n## Heading 2", // Also, you can dynamic set Markdown text
+            // htmlDecode : true,  // Enable / disable HTML tag encode.
+            htmlDecode : "style,script,iframe",  // Note: If enabled, you should filter some dangerous HTML tags for website security.
+            taskList: true,
+        });
+    });
+
+
+    window.onload = function (event) {
+        // setupStars();
+        insertStar1(@ViewData["Grade"]);
+    }
+    function insertStar1(length) {
+
+        const starOff = '<i class="bi bi-star-fill text-danger"></i>';
+
+        var ii = "";
+        for (let i = 0; i < length; i++) {
+
+            ii += starOff;
+        }
+        document.getElementById("star-rating").innerHTML = ii;
+    }
+</script>

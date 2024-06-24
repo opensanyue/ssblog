@@ -1,0 +1,105 @@
+﻿@model aspnetMCVBSUser1.Models.Post
+
+@{
+    ViewData["Title"] = "详情";
+    Layout = "/views/shared/_Layout2.cshtml";
+}
+
+<div class="container-xxl bg-light  pt-3">
+    <dl class="row">
+
+        <dd class="mb-0 ">
+            <h3 class="fw-bold">  @Html.DisplayFor(model => model.Title)</h3>
+        </dd>
+        <dd class="mb-0">
+            @Html.Raw(" 分类：")@Html.DisplayFor(model => model.Category!.Name) &nbsp;
+
+            
+            @if (Model.PostType <= 0 || Model == null)
+            {
+                @Html.Raw(" 格式：Html &nbsp;")
+                ;
+            }
+            else
+            {
+                @Html.Raw(" 格式：MarkDown &nbsp;")
+                ;
+            }
+            @Html.DisplayNameFor(model => model.UpdataDate)：@Html.DisplayFor(model => model.UpdataDate) &nbsp;
+            @Html.DisplayNameFor(model => model.CreateDate)：@Html.DisplayFor(model => model.CreateDate) &nbsp;
+            @* @Html.Raw("点击率：")@Html.DisplayFor(model => model.hits) &nbsp; *@
+            <hr class="mt-2" />
+        </dd>
+
+        <dd>
+
+            <div id="test-markdown-view" class="bg-light">
+                @if (Model!.PostType > 0)
+                {
+                    <textarea style="display:none;"> @Html.Raw(Model.Content)</textarea>
+                }
+                else
+                {   <div>
+                    @Html.Raw(Model.Content)
+                        </div>
+                }
+            </div>
+
+        </dd>
+
+    </dl>
+
+
+    <footer class="border-top footer text-muted">
+        <div class="container mt-3 pb-3 clearfix">
+            <p class="float-start">   &copy; 2024 - 山水酒月  -  <span id="star-rating"></span> <span class="text-danger"> @ViewData["WelcomeSpeech"] </span> - <a asp-area="" asp-controller="Home" asp-action="Help">帮助</a> - <a asp-area="" asp-controller="Home" asp-action="About">关于</a> - <a asp-area="" asp-controller="Setting" asp-action="EditLic">捐助</a> </p>
+            <p class="float-end"> <a asp-action="Index" asp-controller="Blog">返回上一页</a></p>
+        </div>
+    </footer>
+</div>
+<script src="~/lib/editormd/lib/jquery.flowchart.min.js"></script>
+<script src="~/lib/editormd/examples/js/zepto.min.js"></script>
+<script src="~/lib/editormd/lib/prettify.min.js"></script>
+@* <script src="~/lib/editormd/lib/raphael.min.js"></script> *@
+@* <script src="~/lib/google-code-prettify/src/prettify.js"></script> *@
+<script src="~/lib/editormd/lib/underscore.min.js"></script>
+@* <script src="~/lib/editormd/lib/sequence-diagram.min.js"></script> *@
+<script src="~/lib/editormd/lib/flowchart.min.js"></script>
+
+
+<script type="text/javascript">
+    var jQuery = Zepto;  // 为了避免修改flowChart.js和sequence-diagram.js的源码，所以使用Zepto.js时想支持flowChart/sequenceDiagram就得加上这一句
+    $(function () {
+        if (@Model.PostType> 0) {
+            var testView = editormd.markdownToHTML("test-markdown-view", {
+                //markdown: mdstr, // Also, you can dynamic set Markdown text
+                //htmlDecode : true,  // Enable / disable HTML tag encode.
+                htmlDecode: "style,script,iframe",  // Note: If enabled, you should filter some dangerous HTML tags for website security.
+                // emoji: true,
+                taskList: true,
+                // tex: true,  // 默认不解析
+                // flowChart: true,  // 默认不解析
+                // sequenceDiagram: true,  // 默认不解析
+            });
+        }
+       
+    })
+
+
+    window.onload = function (event) {
+
+        // setupStars();
+        insertStar1(@ViewData["Grade"]);
+    }
+    function insertStar1(length) {
+
+        const starOff = '<i class="bi bi-star-fill text-danger"></i>';
+
+        var ii = "";
+        for (let i = 0; i < length; i++) {
+
+            ii += starOff;
+        }
+        document.getElementById("star-rating").innerHTML = ii;
+    }
+</script>

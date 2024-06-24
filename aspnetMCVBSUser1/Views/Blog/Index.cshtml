@@ -1,0 +1,1097 @@
+﻿@{
+    ViewData["Title"] = "博客";
+    Layout = "/views/shared/_Layout2.cshtml";
+    var showBut = (User != null && User.Identity != null && User.Identity.IsAuthenticated) ? 1 : 0;
+
+}
+
+<div id="app" class="container-xxl  bd-layout">
+    <aside class="bd-sidebar">
+        <div style="background-color: #F5F5F5">
+            <header class="header_base">
+                @if (showBut == 1)
+                {
+                    <div class="d-flex align-items-center">
+                        <a href="#" class="link-underline-light p-2" @@click.prevent="showTreeButBar()">编辑</a>
+
+                        @* <a class="bi bi-sort-alpha-down   ms-2 " style="font-size:20px;"  href="#" @@click.prevent="showTreeButBar()" v-show="treebutShow"></a> *@
+                    </div>
+
+
+
+
+
+                    <a href="#" class="link-underline-light float-end" @@click.prevent="append(vNode,vCurrentNode)">添加</a>
+                }
+                else
+                {
+                    <div>分类</div>
+                }
+            </header>
+        </div>
+
+        <div id="treebox" class="custom-tree-container  bd-sidebarTree1" ref="divScroll" v-on:scorll="scroll">
+
+            <div class="m-2 mb-5">
+                <el-tree ref="tree"
+                         :data="categoryTree"
+                         node-key="id"
+                         current-node-key="categoryId"
+                @* default-expand-all *@
+                         @@node-drag-end="handleDragEnd"
+                         @@node-drop="handleDrop"
+                         @@node-click="handleNodeClick"
+                         @@node-expand="handleNodeExpand"
+                         @@node-collapse="handleNodeCollapse"
+                         :default-expanded-keys=defaultExpandIds
+                         :expand-on-click-node="false"
+                         :draggable="isDraggable"
+                         :show-overflow-tooltip="true"
+                         :allow-drop="allowDrop"
+                         :allow-drag="allowDrag"
+                         :highlight-current="true">
+                    <span class="custom-tree-node  span-ellipsis" slot-scope="{ node, data }">
+
+                        <template v-if="data.isEdit==1">
+                            <el-input class="tree-item-Input" size="mini" ref="input"
+                                      @@blur="() => submitEdit(node, data)"
+                                      v-model="newLabel"
+                                      @@keyup.enter.native="enterBlur($event)"></el-input>
+                        </template>
+
+                        <el-tooltip v-else class="item" effect="light" :open-delay="1000" :enterable="false" placement="top-start" popper-class="custom-popper">
+
+                            <div slot="content" class="position-relative">
+                                @* {{ node.label+ (data.postCount<=0?"":("("+data.postCount+")"))||'' }} *@
+                                {{ node.label }}
+                                <span v-if="data.postCount>0" class="badge  border text-muted border-secondary rounded-pill">
+                                    {{data.postCount}}
+                                </span>
+                    </span>
+            </div>
+            <span class="tree-item-left">
+                @* {{ node.label+ (data.postCount<=0?"":("("+data.postCount+")")) }} *@
+                {{ node.label }}
+                <span v-if="data.postCount>0" class="badge  border text-muted border-secondary rounded-pill">
+                    {{data.postCount}}
+                </span>
+            </span>
+
+
+            </el-tooltip>
+            <span v-if="data.id!=-1" class="tree-item-right " v-show="treebutShow">
+                @* <i class="bi bi-arrows-move tree-But" @@click="() =>move(node,data)"></i> *@
+                @* <i class="bi bi-node-plus tree-But" @@click="() => appendClass(node,data)"></i> *@
+                <i class="bi bi-text-indent-right tree-But text-primary me-2" @@click="() => insertAfter(node,data)"></i>
+                @* <i class="bi bi-bookmark-plus tree-But" @@click="() => insertBefore(node,data)"></i> *@
+
+                @* <i class="bi bi-node-plus tree-But" @@click="() => append(node,data)"></i> *@
+
+                <i class="el-icon-edit tree-But text-primary  me-2" @@click="() =>edit(node,data)"></i>
+                <i class="el-icon-delete tree-But text-primary  me-2" @@click="() => remove(node, data)"></i>
+
+
+
+
+            </span>
+            </span>
+            </el-tree>
+        </div>
+</div>
+    </aside>
+
+<main style="background-color: #F5F5F5;">
+    <div class="header_sticky" style="background-color: #F5F5F5">
+        <header class="header_base">
+
+            <div class="row m-0">
+                <div class="col p-0">
+                    @if (showBut == 1)
+                    {
+                        @*  <a href="#" class="link-underline-light " @@click.prevent="">编辑</a> *@
+                    }
+                    <i class="bi bi-search " @@click=""></i>
+                    <input class="ms-1" type="text" placeholder="筛选" @@change.prevent='handleInput(event)'>
+                </div>
+            </div>
+            <div>
+                @if (showBut == 1)
+                {
+                    <a v-bind:href="['../Blog/CreateMD/?categoryId='+categoryId]" class="link-underline-light me-2">添加MD</a>
+                    <a v-bind:href="['../Blog/Create/?categoryId='+categoryId]" class="link-underline-light  me-2">添加</a>
+
+                    <i class="bi bi-three-dots-vertical  m-1 text-primary" data-bs-toggle="dropdown" aria-expanded="false"></i>
+
+                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+
+                        <li v-if="isSortShow==true">
+
+                            <div class="ms-2">
+                                <i v-if="postSortType<=0" class="bi bi-check-lg"></i>
+                                <i v-else class="bi bi-check-lg opacity-0"></i>
+                                <a href="#" class="link-underline-light p-2 " @@click.prevent="UpdataSortType(0)">
+                                    按更新日期
+                                </a>
+
+                            </div>
+
+                        </li>
+                        <li v-if="isSortShow==true">
+                            <div class="ms-2">
+                                <i v-if="postSortType==1" class="bi bi-check-lg"></i>
+                                <i v-else class="bi bi-check-lg opacity-0"></i>
+                                <a href="#" class="link-underline-light p-2 " @@click.prevent="UpdataSortType(1)">
+                                    按标题名
+                                </a>
+
+                            </div>
+                            @* <a class="dropdown-item" href="#">按标题名</a> *@
+                        </li>
+                        <li v-if="isSortShow==true">
+                            @* <a class="dropdown-item" href="#">按排序位置</a> *@
+                           @*  <div class="ms-2">
+                                <i v-if="postSortType==2" class="bi bi-check-lg"></i>
+                                <i v-else class="bi bi-check-lg opacity-0"></i>
+                                <a href="#" class="link-underline-light p-2 " @@click.prevent="UpdataSortType(2)">
+                                    按排序位置
+                                </a>
+
+                            </div> *@
+                        </li>
+
+                        <hr v-if="isSortShow==true" class="divider m-1">
+
+                        <li v-if="isSortShow==true">
+                            @* <a class="dropdown-item" href="#">按排序位置</a> *@
+                            <div class="ms-2">
+                                <i v-if="postSortDirection==1" class="bi bi-check-lg"></i>
+                                <i v-else class="bi bi-check-lg opacity-0"></i>
+                                <a href="#" class="bi bi-sort-alpha-down  link-underline-light p-2 fs-6 " @@click.prevent="updataPostSortDirection(1)">
+                                    正序
+                                </a>
+
+                            </div>
+                        </li>
+
+                        <li v-if="isSortShow==true">
+                            @* <a class="dropdown-item" href="#">按排序位置</a> *@
+                            <div class="ms-2">
+                                <i v-if="postSortDirection<=0" class="bi bi-check-lg"></i>
+                                <i v-else class="bi bi-check-lg opacity-0"></i>
+                                <a href="#" class="bi bi-sort-alpha-up link-underline-light p-2 fs-6 " @@click.prevent="updataPostSortDirection(0)">
+                                    倒序
+                                </a>
+
+                            </div>
+                        </li>
+                        <hr v-if="isSortShow==true" class="divider m-1">
+
+                        <li><a class="dropdown-item  text-primary" style="padding-left:35px" href="#" v-bind:href="['../Blog/GetUploadMultipleFiles/'+categoryId]">导入Markdown(Typoar)</a></li>
+                        @* <li><a class="dropdown-item  text-primary" style="padding-left:35px" href="#" @@click.prevent="getcpuid()">导出</a></li> *@
+                        @* <li><a class="dropdown-item  text-primary" style="padding-left:35px" href="#" v-bind:href="['../Setting/EditLic']">注册</a></li> *@
+                    </ul>
+                }
+                else
+                {
+
+                }
+            </div>
+        </header>
+    </div>
+
+    <div class="m-2" id="postbody">
+    </div>
+    <div>
+        <nav class="mt-5 ms-2" aria-label="Page navigation example">
+            <ul :class="('pagination '+ HidePageList)">
+                <li :class="('page-item '+prevDisabled)">
+                    <a href="#" class="page-link" @@click.prevent="loadPost(categoryId,1,pageSize)">首页</a>
+                </li>
+                <li :class="('page-item '+prevDisabled)">
+                    <a href="#" class="page-link" @@click.prevent="loadPost(categoryId,pageIndex-1,pageSize)">上一页</a>
+                </li>
+
+                <li :class="('page-item '+ hightPageStyle(InitIndex + n))" v-for="n in pageNum">
+                    <a href="#" class="page-link"
+                       @@click.prevent="loadPost(categoryId,InitIndex+n,pageSize)">{{InitIndex+n}}</a>
+                </li>
+
+                <li :class="('page-item '+nextDisabled)">
+                    <a href="#" class="page-link"
+                       @@click.prevent="loadPost(categoryId,pageIndex+1,pageSize)">下一页</a>
+                </li>
+
+                <li :class="('page-item '+nextDisabled)">
+                    <a href="#" class="page-link"
+                       @@click.prevent="loadPost(categoryId,totalPages,pageSize)">尾页</a>
+                </li>
+
+                <li class="page-item">{{pageIndex}}/{{totalPages}}</li>
+
+            </ul>
+        </nav>
+
+        @*  <footer class="border-top footer text-muted  ms-2 me-2">
+        <div class="container  mb-4">
+        &copy; 2024 - 山水酒月 - <a asp-area="" asp-controller="Home" asp-action="About">关于</a>
+        </div>
+        </footer> *@
+        <partial name="_footer" />
+       
+    </div>
+</main>
+</div>
+
+<script>
+    let id = 1000;
+    const app = new Vue({
+        el: '#app',
+        data() {
+            return {
+                files: 0,
+                scrollTop: 0,
+                isDraggable: true,
+                newLabel: "",
+                findFiled: "",
+                treebutShow: false,
+                postSortType: 0, //0：更新日期 1：标题 2：排序序号
+                postSortDirection: 0, //0:倒序"321", 1：正序 "123"
+                isSortShow: true,
+                categoryTree: [],
+                vCurrentNode: null,
+                vNode: null,
+                defaultProps: {
+                    children: 'children',
+                    label: 'label'
+                },
+                defaultExpandIds: [],
+                prevDisabled: "",
+                nextDisabled: "",
+                HidePageList: "",
+                HightPageNum: "",
+                pageNum: 0,
+                InitIndex: 0,
+                pageIndex: 0,
+                totalPages: 0,
+                pageSize: 3,
+                categoryId: -1,
+            };
+        },
+
+        mounted() {
+            window.addEventListener('scroll', this.scroll, true);
+
+            this.setDraggable(false);
+
+
+
+            this.$nextTick(() => {
+                this.loadAllCategory();
+
+                setTimeout(() => { this.loaddbScroll(); }, 300);
+
+                // const scrollableDiv = this.$refs.divScroll;
+                // if (scrollableDiv.scrollHeight > scrollableDiv.clientHeight) {
+                //     console.log('该元素有滚动条');
+                // } else {
+                //     console.log('该元素没有滚动条');
+                // }
+            });
+
+
+        },
+        methods: {
+            getcpuid() {
+                axios.post("../Blog/GetCpuId").then(
+                    (response) => {
+                        if (response.data != null && response.data.code == 0 && response.data.entity != null && response.data.entity.cpuid != null) {
+                            alert(response.data.entity.cpuid);
+                        }
+                    });
+            },
+            setFileCount(filecount) {
+                if (this.categoryTree.length > 0) {
+                    if (this.categoryTree[0].id == -1) {
+                        this.categoryTree[0].postCount = filecount;
+                    }
+                }
+                console.log(" categoryTree.length:" + this.categoryTree.length);
+                console.log(" categoryTree.length:" + this.categoryTree[0]);
+            },
+            returnStr(str) {
+                return str;
+            },
+            // 树节点展开
+            handleNodeExpand(data) {
+                // 保存当前展开的节点
+                let flag = false
+                this.defaultExpandIds.some(item => {
+                    if (item === data.id) { // 判断当前节点是否存在， 存在不做处理
+                        flag = true
+                        return true
+                    }
+                })
+                if (!flag) { // 不存在则存到数组里
+                    this.defaultExpandIds.push(data.id)
+                }
+            },
+            // 树节点关闭
+            handleNodeCollapse(data) {
+                this.defaultExpandIds.some((item, i) => {
+                    if (item === data.id) {
+                        // 删除关闭节点
+                        this.defaultExpandIds.length = i
+                    }
+                })
+            },
+            scroll: function (event) {
+                if (event.target.scrollTop == null) return;
+                this.scrollTop = event.target.scrollTop;
+            },
+            hightPageStyle: function (a) {
+                // if (a === this.pageIndex) {
+                //     return "active";
+                // } else {
+                //     return "";
+                // }
+                return a === this.pageIndex ? "active" : "";
+            },
+            setDraggable(draggable) {
+                this.isDraggable = draggable;
+            },
+            UpdataSortType: function (sortType1) {
+                const newChild1 = { Value: sortType1, Id: this.categoryId };
+                axios.post("../Blog/UpdataSortType", newChild1).then(
+                    (response) => {
+                        if (response.data != null && response.data.code == 0) {
+                            //有数据
+                            console.log(response.data);
+                            this.postSortType = sortType1;
+                            //this.$set(this.vCurrentNode, "SortType", sortType1);
+                            // 获取当前选中的节点
+                            const currentKey = this.$refs.tree.getCurrentKey();
+                            const currentNodes = this.$refs.tree.getNode(currentKey).data.sortType = sortType1;
+                            console.log('当前选中的节点数据：', currentNodes);
+                            const newChild = { CategoryId: currentKey, SortType: sortType1 };
+                            this.getpost(newChild);
+                        }
+                    },
+                    (response) => {
+                        //失败
+                        console.log("category添加append失败。");
+                        flay = true;
+                    });
+            },
+            updataPostSortDirection(sortDirection1) {
+
+                const newChild1 = { Value: sortDirection1, Id: this.categoryId };
+                axios.post("../Blog/UpdataSortDirection", newChild1).then(
+                    (response) => {
+                        if (response.data != null && response.data.code == 0) {
+                            //有数据
+                            console.log(response.data);
+                            this.postSortDirection = sortDirection1;
+                            // 获取当前选中的节点
+                            const currentKey = this.$refs.tree.getCurrentKey();
+                            const currentNodes = this.$refs.tree.getNode(currentKey).data.sortDirection = sortDirection1;
+                            console.log('当前选中的节点数据：', currentNodes);
+                            const newChild = { CategoryId: currentKey, SortDirection: sortDirection1 };
+                            this.getpost(newChild);
+                        }
+                    },
+                    (response) => {
+                        //失败
+                        console.log("category添加append失败。");
+                        flay = true;
+                    });
+            },
+            createPost: function () {
+                axios.get("../posts/Create?categoryId=" + this.categoryId).then(
+                    (response) => {
+
+                    },
+                    (response) => {
+                        //失败
+                        console.log("createPost error");
+                    });
+            },
+            loadAllCategory: function () {
+                let _this = this;
+                axios.get("../Blog/GetAllCategory").then(
+                    (response) => {
+                        //成功
+                        if (response.data != null && response.data.entity != null && response.data.entity.categories != null) {
+                            //有数据
+                            _this.categoryTree = response.data.entity.categories;
+
+                            //_this.defaultExpandIds = response.data.entity.categoryStates;
+                            //post有数据
+                            _this.tableData = response.data.entity.posts.postList;
+                            _this.total = response.data.entity.posts.total;
+                            _this.pageSize = response.data.entity.posts.pageSize;
+                            _this.currentPage = response.data.entity.currentPage;
+                            _this.categoryId = response.data.entity.currentCategory;
+
+                        }
+                    },
+                    (response) => {
+                        //失败
+                        console.log("error");
+                    },
+                ).then(() => {
+                    this.$nextTick(() => {
+                        this.loadDb();
+
+                    });
+
+                });
+            },
+
+            handleNodeClick(data, node, item) {
+                console.log(data);
+                // alert(data.label);
+
+                this.vCurrentNode = data;
+                this.categoryId = data == null ? 0 : data.id;
+                this.vNode = node;
+
+                //如果id==-1则排序不可用
+                this.isSortShow = this.categoryId <= 0 ? false : true;
+
+                //获取排序数据
+                this.postSortType = data.sortType || 0;
+                this.postSortDirection = data.sortDirection || 0;
+
+                ////获取文章列表
+                if (data != this.myCurrentNode) {
+                    let _this = this;
+                    const newChild = { CategoryId: data.id, SortType: data.sortType, SortDirection: data.sortDirection };
+                    this.getpost(newChild);
+                }
+            },
+            getpost(newChild) {
+                axios.post("../Blog/IndexList/", newChild).then(
+                    (response) => {
+                        //成功
+                        if (response.data != null) {
+                            //有数据
+                            // this.tableData = response.data.Entity.postList;
+                            // this.total = response.data.Entity.total;
+                            // this.pageSize = response.data.Entity.pageSize;
+                            // this.currentPage = 1;
+                            document.getElementById("postbody").innerHTML = response.data;
+                            // console.log("handleNodeClick：CategoryId=" + @ViewData["CategoryId"]+" PageIndex=" + @ViewData["PageIndex"]);
+                            this.getPostParm();
+                        }
+                    },
+                    (response) => {
+                        //失败
+                        // alert(response.data);
+                        console.log("handleNodeClick：获取文章失败");
+                    });
+
+            },
+            getPostParm() {
+                axios.post("../Blog/IndexListParm/").then(
+                    (response) => {
+                        //成功
+                        if (response.data != null) {
+                            //有数据
+                            // this.tableData = response.data.Entity.postList;
+                            // this.total = response.data.Entity.total;
+                            // this.pageSize = response.data.Entity.pageSize;
+                            // this.currentPage = 1;
+                            // document.getElementById("postbody").innerHTML = response.data;
+                            // console.log("handleNodeClick：CategoryId=" + @ViewData["CategoryId"]+" PageIndex=" + @ViewData["PageIndex"]);
+                            var result1 = response.data.entity;
+                            console.log("post参数： ", result1);
+                            this.prevDisabled = !result1.paginatedListParm.hasPreviousPage ? "disabled" : "";
+                            this.nextDisabled = !result1.paginatedListParm.hasNextPage ? "disabled" : "";
+                            this.HidePageList = result1.paginatedListParm.totalPages <= 1 ? "d-none" : "";
+                            this.pageIndex = result1.postParm.pageIndex;
+                            this.totalPages = result1.paginatedListParm.totalPages;
+                            this.pageSize = result1.postParm.pageSize;
+                            this.categoryId = result1.postParm.categoryId;
+                            this.pageNum = (result1.paginatedListParm.totalPages < result1.paginatedListParm.showIndexCount) ?
+                                result1.paginatedListParm.totalPages :
+                                result1.paginatedListParm.showIndexCount;
+                            if (result1.paginatedListParm.totalPages > result1.paginatedListParm.showIndexCount) {
+                                var cenentVal = Math.round(result1.paginatedListParm.showIndexCount / 2) + 1;
+                                var offsetIndex = result1.postParm.pageIndex - cenentVal;
+                                this.InitIndex = offsetIndex <= 0 ? 0 : offsetIndex;
+                                if ((result1.postParm.pageIndex + (result1.paginatedListParm.showIndexCount - cenentVal)) > result1.paginatedListParm.totalPages) {
+                                    this.InitIndex = result1.paginatedListParm.totalPages - this.pageNum;
+                                }
+                            }
+                        }
+                    },
+                    (response) => {
+                        //失败
+                        // alert(response.data);
+                        console.log("getPostParm：获取文章参数失败");
+                    });
+            },
+            showSocrllX(hide) {
+                if (hide == true) {
+                    document.getElementById("treebox").scrollLeft = 0;
+                    document.getElementById("treebox").style.overflowX = 'hidden';
+                } else {
+                    document.getElementById("treebox").style.overflowX = 'auto';
+                }
+            },
+
+            showTreeButBar() {
+                var userinfo = JSON.parse(sessionStorage.getItem('indexTree'))
+                console.log("userinfo:", userinfo)
+                this.treebutShow = !this.treebutShow;
+                if (this.treebutShow == true) {
+                    this.showSocrllX(true);
+                    this.setDraggable(true);
+                } else {
+                    this.showSocrllX(false);
+                    this.setDraggable(false);
+                }
+            },
+
+            edit(node, data) {
+                // data.label = "修改了" + data.label;
+                console.log(
+                    "before:",
+                    data.id,
+                    data.label,
+                    data.isEdit
+                );
+                this.treebutShow = false;
+                this.$set(data, "isEdit", 1);
+                this.isDraggable = false;
+                this.newLabel = data.label;
+                this.$nextTick(() => {
+                    this.$refs.input.focus();
+                });
+                console.log("after:", data.id, data.label, data.isEdit);
+
+            },
+            submitEdit(node, data) {
+                // console.log('点击了保存按钮')
+                var flay = false;
+                if (data.label != this.newLabel) {
+                    //后台更新
+                    //保存到数据库
+
+                    const newChild1 = { Name: this.newLabel, Id: data.id };
+                    let _this = this;
+                    axios.post("../Blog/EditName", newChild1).then(
+                        (response) => {
+                            if (response.data != null && response.data.code == 0) {
+                                //有数据
+                                console.log(response.data);
+                                this.$set(data, "label", this.newLabel);
+                                this.newLabel = "";
+                                this.$set(data, "isEdit", 0);
+                                this.treebutShow = true;
+                                this.isDraggable = true;
+                            }
+                        },
+                        (response) => {
+                            //失败
+                            console.log("category添加append失败。");
+                            flay = true;
+                        },
+                    );
+                } else {
+                    flay = true;
+                }
+                if (flay == true) {
+                    console.log("没有修改");
+                    this.newLabel = "";
+                    this.$set(data, "isEdit", 0);
+
+                    this.treebutShow = true;
+                    this.isDraggable = true;
+                }
+
+            },
+
+            submitFind() {
+                console.log("测试：" + this.findFiled);
+            },
+            append(node, data) {
+                var i = (data == null || data.id == -1) ? 0 : data.id;
+                var level = node == null ? 1 : node.level;
+                const newChild = { PId: i };
+                //保存到数据库
+                axios.post("../Blog/Append/", newChild).then(
+                    (response) => {
+                        if (response.data != null && response.data.code == 0 && response.data.entity != null && response.data.entity.category != null) {
+                            //有数据
+                            console.log(response.data);
+                            //data.children.push(response.data.entity.category);
+                            var uu = data;
+                            // if (node != null && node.data != null && node.data.id != -1 && this.categoryTree.length > 0) {
+                            //     // if (level == 1) {
+                            //     //     node.data.push(response.data.entity.category);
+                            //     // } else {
+                            //         node.data.children.push(response.data.entity.category);
+                            //     // }
+
+                            // } else {
+                            //     this.categoryTree.push(response.data.entity.category)
+                            // }
+                            if (data != null && data.id != -1) {
+                                data.children.push(response.data.entity.category);
+                            } else {
+                                this.categoryTree.push(response.data.entity.category)
+                            }
+                        }
+                        this.defaultExpandIds.push(i);
+                    },
+                    (response) => {
+                        //失败
+                        console.log("category添加append失败。");
+                    },
+                );
+            },
+            appendClass(node, data) {
+                var i = 0;
+                var level = node == null ? 1 : node.level;
+                if (level == 1) {
+                    console.log("parent.PID=" + 0);
+
+                } else {
+                    console.log("parent.PID=" + data.parentID);
+
+                    i = data.parentID;
+                }
+                const newChild = { PId: i };
+
+                axios.post("../Blog/Append/", newChild).then(
+                    (response) => {
+                        if (response.data != null && response.data.code == 0 && response.data.entity.category != null) {
+                            //更新视图中的项
+                            if (node != null && this.categoryTree.length > 0) {
+                                if (level == 1) {
+                                    node.parent.data.push(response.data.entity.category);
+                                } else {
+                                    node.parent.data.children.push(response.data.entity.category);
+                                }
+                            } else {
+                                this.categoryTree.push(response.data.entity.category)
+                            }
+                            return;
+                        }
+                    },
+                    (response) => {
+                        //失败
+                        console.log("category添加append失败。");
+                    },
+                );
+
+
+                this.updateApiGroup(this.data);
+            },
+            insertBefore(node, data) {
+                //之前
+
+                // if (Node.level == 1) {
+                //     var i = Node.parent.data.findIndex(x => x.id == data.id);
+                //     if (i < 0) return;
+                //     Node.parent.data.splice(i , 0, newChild);
+                // } else {
+
+                //     var i = Node.parent.data.children.findIndex(x => x.id == data.id);
+                //     if (i < 0) return;
+                //     Node.parent.data.children.splice(i , 0, newChild);
+                // }
+                // this.updateApiGroup(this.data);
+
+                const parent = node.parent;
+                const children = parent.data.children || parent.data;
+                const index = children.findIndex(d => d.id === data.id);
+
+                var preNodeId = index > 0 ? children[index - 1].id : -1;
+                var nextNodeId = data.id;
+                console.log("insertBefore:" + preNodeId + " _ " + nextNodeId);
+                //更新数据库
+                const newChild = { preId: preNodeId, nextId: nextNodeId };
+                axios.post("../Blog/Insert/", newChild).then(
+                    (response) => {
+                        if (response.data != null && response.data.code == 0 && response.data.entity.category != null) {
+                            //删除视图中的项
+                            if (index >= 0) children.splice(index, 0, response.data.entity.category);
+                            return;
+                        }
+                    },
+                    (response) => {
+                        //失败
+                        console.log("category添加append失败。");
+                    },
+                );
+
+            },
+            insertAfter(node, data) {
+
+                // const newChild = { id: id++, isEdit: 0, label: '新建分类' + (id++), children: [] };
+                // if (Node.level == 1) {
+                //     var i = Node.parent.data.findIndex(x => x.id == data.id);
+                //     if (i < 0) return;
+                //     Node.parent.data.splice(i + 1, 0, newChild);
+                // }else{
+                //     var i = Node.parent.data.children.findIndex(x => x.id == data.id);
+                //     if (i < 0) return;
+                //     Node.parent.data.children.splice(i + 1, 0, newChild);
+                // }
+
+                // this.updateApiGroup(this.data);
+                const parent = node.parent;
+                const children = parent.data.children || parent.data;
+                const index = children.findIndex(d => d.id === data.id);
+                //获取前后记录的id
+                var preNodeId = data.id;
+                var nextNodeId = ((index + 1) >= 0 && (index + 1) < children.length) ? children[index + 1].id : -1;
+                console.log("insertAfter:" + preNodeId + " _ " + nextNodeId);
+
+                //更新数据库
+                const newChild = { preId: preNodeId, nextId: nextNodeId };
+                axios.post("../Blog/Insert/", newChild).then(
+                    (response) => {
+                        if (response.data != null && response.data.code == 0 && response.data.entity.category != null) {
+                            //添加新记录
+                            if (index >= 0) children.splice(index + 1, 0, response.data.entity.category);
+                            return;
+                        }
+                    },
+                    (response) => {
+                        //失败
+                        console.log("category添加append失败。");
+                    },
+                );
+            },
+
+            move(node, data) { },
+            remove(node, data) {
+                //var ulrstr=
+                axios.post("../Blog/Delete/" + data.id).then(
+                    (response) => {
+                        if (response.data != null && response.data.code == 0 && response.data.entity != null) {
+                            //删除视图中的项
+                            const parent = node.parent;
+                            const children = parent.data.children || parent.data;
+                            const index = children.findIndex(d => d.id === data.id);
+                            children.splice(index, 1);
+
+
+
+                            //更新文件总数
+                            this.setFileCount(response.data.entity.fileCount);
+                            console.log(this.categoryId);
+                            //loadPost(categoryId, pageIndex - 1, pageSize)
+                            if (children.length <= 0) {
+                                this.categoryId = parent.data.id
+                            } else if (index < children.length) {
+                                this.categoryId = children[index].id;
+                            } else {
+                                this.categoryId = children[children.length - 1].id;
+                            }
+                            this.$refs.tree.setCurrentKey(this.categoryId) // 选中指定节点
+                            this.loadPost(this.categoryId, this.pageIndex, this.pageSize)
+                            return;
+                        }
+                    },
+                    (response) => {
+                        //失败
+                        console.log("category添加append失败。");
+                    },
+                );
+
+            },
+
+            //拖动结束
+            handleDragEnd(draggingNode, dropNode, dropType, ev) {
+                console.log('tree drag end: ', dropNode && dropNode.label, dropType);
+                if (dropNode.data.id == 0 && dropType == "before") {
+                    this.tree.dragState.dropNode = null;
+                    this.tree.dragState.draggingNode = null;
+                    this.tree.$el.querySelectorAll('.is-drop-inner').forEach(d => {
+                        d.classList.remove('is-drop-inner');
+                    });
+                    return;
+                }
+
+                // 调后端更新
+                this.updateApiGroup(this.data);
+            },
+            //拖拽成功完成时触发的事件
+            handleDrop(draggingNode, dropNode, dropType, ev) {
+                console.log('tree drop: ', dropNode.label, dropType);
+
+                if (dropType == "inner") {
+                    let updateData = draggingNode.data;
+                    let parent = dropNode.data;
+
+                    console.log("category.handleDrop.inner=pid:" + parent.id + " _ updateData.id:" + updateData.id);
+
+
+                    const newChild = { PId: parent.id, UPdataId: updateData.id };
+                    //保存到数据库
+                    axios.post("../Blog/Append/", newChild).then(
+                        (response) => {
+                            if (response.data != null && response.data.code == 0 && response.data.entity != null && response.data.entity.category != null) {
+                                //有数据
+                                console.log(response.data);
+                                // data.children.push(response.data.entity.category);
+                            }
+                        },
+                        (response) => {
+                            //失败
+                            console.log("category添加append失败。");
+                        },
+                    );
+                } else if (dropType == "before") {
+                    //以前
+                    // var children = dropType != "inner" ? dropNode.parent.data : dropNode.data;
+                    let updateData = draggingNode.data;
+
+                    const parent = dropNode.parent;
+                    const children = parent.data.children || parent.data;
+                    const index = children.findIndex(d => d.id === updateData.id);
+
+                    var preNodeId = index > 0 ? children[index - 1].id : -1;
+                    var nextNodeId = dropNode.data.id;
+                    var insertNodeId = updateData.id;
+                    console.log("category.handleDrop.Before=" + preNodeId + " _ " + insertNodeId + " _ " + nextNodeId);
+                    //更新数据库
+                    const newChild = { preId: preNodeId, nextId: nextNodeId, InsertId: insertNodeId };
+                    axios.post("../Blog/Insert/", newChild).then(
+                        (response) => {
+                            if (response.data != null && response.data.code == 0 && response.data.entity.category != null) {
+                                //删除视图中的项
+                                // if (index >= 0) children.splice(index, 0, response.data.entity.category);
+                                return;
+                            }
+                        },
+                        (response) => {
+                            //失败
+                            console.log("category添加append失败。");
+                        },
+                    );
+
+                } else if (dropType == "after") {
+                    //以前
+                    // var children = dropType != "inner" ? dropNode.parent.data : dropNode.data;
+                    let updateData = draggingNode.data;
+
+                    const parent = dropNode.parent;
+                    const children = parent.data.children || parent.data;
+                    const index = children.findIndex(d => d.id === updateData.id);
+
+                    var preNodeId = dropNode.data.id;
+                    var insertNodeId = updateData.id;
+                    var nextNodeId = ((index + 1) >= 0 && (index + 1) < children.length) ? children[index + 1].id : -1;
+
+                    console.log("category.handleDrop.after=" + preNodeId + " _ " + insertNodeId + " _ " + nextNodeId);
+                    //更新数据库
+                    const newChild = { preId: preNodeId, nextId: nextNodeId, InsertId: insertNodeId };
+                    axios.post("../Blog/Insert/", newChild).then(
+                        (response) => {
+                            if (response.data != null && response.data.code == 0 && response.data.entity.category != null) {
+                                //删除视图中的项
+                                // if (index >= 0) children.splice(index, 0, response.data.entity.category);
+                                return;
+                            }
+                        },
+                        (response) => {
+                            //失败
+                            console.log("category添加append失败。");
+                        },
+                    );
+
+                }
+            },
+            //拖拽时判定目标节点能否被放置
+            allowDrop(draggingNode, dropNode, type) {
+                console.log('tree allowDrop: ', draggingNode.data.id, dropNode.data.id, type);
+                if (dropNode.data.id === -1 && type != "next")
+                    return false;
+                return true;
+            },
+            //判断节点能否被拖拽
+            allowDrag(draggingNode) {
+                // 顶层默认分组不允许拖拽
+                if (draggingNode.data.id === -1) {
+                    return false;
+                } else {
+                    return true;
+                }
+
+            },
+
+            ellipsis(value, len) {
+                if (!value) return ''
+                if (value.length > len) {
+                    var i = value.slice(0, len) + '...';
+                    console.log('ellipsis Label:{0} ', i);
+                    return i;
+                }
+                return value
+            },
+            //更新数据
+            updateApiGroup(data) {
+                console.log(data, '数据');
+                // updateApiGroup(1, data)
+                //   .then(response => {
+                //     console.log(response)
+                //   })
+                //   .catch(err => {
+                //     console.log(err)
+                //   })
+            },
+            //回车失去焦点
+            enterBlur(event) {
+                event.target.blur();
+            },
+            loadPost(categoryId, pageindex, pagesize) {
+                console.log("loadPost：参数: categoryId=" + categoryId + " pageindex=" + pageindex + " pagesize=" + pagesize);
+                let _this = this;
+                const newChild = { CategoryId: categoryId, PageIndex: pageindex, PageSize: pagesize };
+
+                this.getpost(newChild);
+            },
+            handleInput(event) {
+                const inputValue = event.target.value;
+                // const nonChineseRegex = /[^a-zA-Z0-9]/g; // 非中文字符的正则表达式
+                // const filteredValue = inputValue.replace(nonChineseRegex, ''); // 过滤掉非中文字符
+                // event.target.value = filteredValue; // 将输入框的值设置为过滤后的值
+                // if (inputValue == "") return;
+                console.log("handleInput.inputValue= " + inputValue);
+                //const newChild = { FindStr: inputValue };
+                //this.axiosLoadPost(newChild);
+                this.loadPostByFindstr(inputValue);
+            },
+            loadPostByFindstr(findstr) {
+                console.log("loadPostByFindstr：参数: FindStr=" + findstr);
+                const newChild = { FindStr: findstr };
+                this.getpost(newChild);
+            },
+
+            bakDb() {
+                sessionStorage.setItem("indexTreeScrollTop", JSON.stringify(this.scrollTop))
+                var scrollTop1 = JSON.parse(sessionStorage.getItem('indexTreeScrollTop'))
+                sessionStorage.setItem("indexTree", JSON.stringify(this.categoryId))
+                sessionStorage.setItem("indexTreeExpandIds", JSON.stringify(this.defaultExpandIds))
+                // sessionStorage.setItem("treebutShow", JSON.stringify(this.treebutShow))
+                console.log(this.scrollTop, scrollTop1, this.categoryId);
+            },
+            loadDb() {
+                console.log(this.categoryId);
+                sessionStorage.setItem("AppName", JSON.stringify("@Html.Raw(ViewData["AppName"])"))
+                var userinfo = JSON.parse(sessionStorage.getItem('indexTree'))
+                if (userinfo != null) {
+                    this.$refs.tree.setCurrentKey(userinfo) // 选中指定节点
+                    this.vCurrentNode = this.$refs.tree.getCurrentNode();
+                    if (this.vCurrentNode != null) this.handleNodeClick(this.vCurrentNode);
+                } else {
+                    this.$refs.tree.setCurrentKey(this.categoryId) // 默认选中节点第一个
+                    this.vCurrentNode = this.$refs.tree.getCurrentNode();
+                    var node = this.$refs.tree.$el.querySelector('.el-tree-node');
+                    node.click();
+                }
+
+                var ExpandIds = JSON.parse(sessionStorage.getItem('indexTreeExpandIds'))
+                if (ExpandIds != null) {
+                    this.defaultExpandIds = ExpandIds;
+                }
+
+                // var showbut = JSON.parse(sessionStorage.getItem('treebutShow'))
+                // if (showbut != null && showbut==true) {
+                //     this.showTreeButBar();
+                // }
+
+            },
+            loaddbScroll() {
+                var scrollTop = JSON.parse(sessionStorage.getItem('indexTreeScrollTop'))
+                if (scrollTop != null) this.$refs.divScroll.scrollTop = scrollTop;
+            }
+        },
+
+
+
+    });
+
+
+    function getCateoryID() {
+        return app.categoryId;
+    };
+
+
+    // function axiosLoadPost(data) {
+    //     $.ajax({
+    //         type: "post",
+    //         url: "../Categories/IndexList/",
+    //         async: false,
+    //         contentType: 'application/json;charset=UTF-8',
+    //         data: JSON.stringify(data),
+    //         success: function (result) {
+    //             // document.getElementById("postbody").innerHTML = result;
+    //             $('#postbody').html(result);
+    //         },
+    //         error: function (e) {
+    //             alert('API调用出错!');
+    //             console.log("API调用出错!: ", e);
+    //         }
+    //     });
+
+
+    window.onbeforeunload = function (event) {
+        app.bakDb();
+      
+    }
+
+    window.onload = function (event) {
+        
+        // setupStars();
+        insertStar1(@ViewData["Grade"]);
+    }
+    function insertStar1(length) {
+       
+        const starOff = '<i class="bi bi-star-fill text-danger"></i>';
+      
+        var ii="";
+        for (let i = 0; i < length; i++) {
+
+            ii += starOff;
+        }
+        document.getElementById("star-rating").innerHTML = ii;
+    }
+   
+</script>
+
+<style lang="scss">
+    // 处理提示框的颜色
+    .sub-poper-class.el-tooltip__popper.is-light {
+        background: rgba(204,0,255, 1) !important;
+        box-shadow: 0px 2px 8px 0px rgba(0, 0, 0, 0.15);
+        border: none;
+        & > div
+
+    {
+        color: gray !important;
+    }
+
+    }
+
+    // 处理箭头的颜色
+    .sub-poper-class.el-tooltip__popper .popper__arrow {
+        border: none;
+        background: rgba(204,0,255, 1) !important;
+        box-shadow: 0px 2px 8px 0px rgba(0, 0, 0, 0.15);
+    }
+        .custom-popper {
+      /* height: 200px; /* 设置tooltip的宽度 */ */
+      margin: 0px; /* 设置tooltip的内边距 */
+      padding:3px;
+      font-size: 12px; /* 设置tooltip的字体大小 */
+      /* 其他你需要的样式 */
+    }
+
+
+</style>

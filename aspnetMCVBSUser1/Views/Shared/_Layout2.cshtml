@@ -1,0 +1,64 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/lib/bootstrap/font/bootstrap-icons.css" />
+    <link rel="stylesheet" href="~/lib/ElementUI/element-ui.css" />
+    
+    <link rel="stylesheet" href="~/aspnetMCVBSUser1.styles.css" asp-append-version="true" />
+    
+    <link rel="stylesheet" href="~/lib/editormd/css/editormd.css" rel="stylesheet" />
+    <link href="~/lib/editormd/css/editormd.preview.css" rel="stylesheet" />
+    @* <link rel="stylesheet" href="~/css/katex.min.css" rel="stylesheet" /> *@
+    @* <link href="~/lib/google-code-prettify/src/prettify.css" rel="stylesheet" /> *@
+   <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/js/popper.min.js"></script>
+    <script src="~/lib/bootstrap/js/bootstrap.bundle.js"></script>
+    <script src="~/lib/bootstrap/js/bootstrap.min.js"></script>
+   
+    <script src="~/lib/vue/dist/vue.min.js"></script>
+    <script src="~/lib/ElementUI/element-ui.js"></script>
+    <script src="~/lib/axios/dist/axios.js"></script>
+    <script src="~/lib/editormd/editormd.js"></script>
+    <script src="~/lib/editormd/lib/marked.min.js"></script>
+   
+</head>
+<body class="container-xxl  p-0">
+    <div class="headerTitle">
+        
+            <h1 class="ms-4" id="appname">@ViewData["AppName"]</h1>
+            <div>
+            <img  src="/images/head3.png" class="img-fluid" alt="...">
+        </div>
+        <nav class="navbar navbar-expand-sm p-0 me-2" >
+            <partial name="_LoginPartial"/>
+        </nav>
+       
+    </div>
+
+    <header class="navbar navbar-expand-lgmt-2 mb-0 pt-0">
+        <div class="container-xxl" style="background-color:#663">
+            <div class="navbar-header navbar-collapse">
+                <ul class="nav justify-content-center">
+                    @* <li>@Html.ActionLink("首页", "Index", "Home", null, new { @class = "nav-link" })</li> *@
+                    <li>@Html.ActionLink("博客", "Index", "Blog", null, new { @class = "nav-link" })</li>
+                    <li>@Html.ActionLink("系统设置", "Edit", "Setting", null, new { @class = "nav-link" })</li>
+                </ul>                
+            </div>
+        </div>
+    </header> 
+    
+    @RenderBody()
+    
+    <script src="~/lib/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+   
+</body>
+</html>
